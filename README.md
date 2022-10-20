@@ -172,6 +172,51 @@ memory attributes
 	index7 attributes:0x00
 		-Device-nGnRnE
 ```
+
+## faultdetails
+It's a python module for gdb. This adds some gdb commands to:
+- Show fault registers
+- Previous Stack Frame (msp or psp)
+- Previous Function if it's possible
+
+> presented at the linaro connect:
+> [slide](https://static.linaro.org/connect/lvc21/presentations/lvc21-308.pdf)
+> [code](https://gist.github.com/microbuilder/1677a27e4566a28b36a79f954f1dede6)
+
+### Dependencies
+- [gdb](https://www.gnu.org/software/gdb/)
+
+### How to use
+- Source the faultdetails module in gdb interface:
+```
+(gdb) source ../gdb-m33/faultdetails.py
+```
+- Help:
+```
+(gdb) help faultdetails
+Perform a stack rollback on an ARM Cortex M device, and shows the
+    main fault status registers.
+```
+
+- Example:
+```
+(gdb) faultdetails
+Fault Status Registers:
+  SHCSR: 0x00000004
+  CFSR:  0x00000001
+  HFSR:  0x40000000
+Previous Stack Frame: msp
+  R0:   0x00000000
+  R1:   0x00000000
+  R2:   0x00000000
+  R3:   0x00000000
+  R12:  0xFFFFFFFF
+  LR:   0xFFFFFFFF // (EXC_RETURN)
+  PC:   0xE000ED00
+  xPSR: 0xF8000000
+
+Previous Function:
+```
 ## Authors
 Ludovic Barre 1udovic.6arre@gmail.com
 
