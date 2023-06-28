@@ -236,6 +236,20 @@ class MpuDump(gdb.Command):
         en = (reg_rlar & 0x1)
         return en_desc.get(en)
 
+    def hfnmiena_description(self, reg_ctrl):
+        hfnmiena_desc = {0: "Disables the MPU for these handlers",
+                         1: "Use the MPU for memory accesses by these handlers"}
+
+        hfnmiena = (reg_ctrl & 0x2) >> 1
+        return hfnmiena_desc.get(hfnmiena)
+
+    def privdefena_description(self, reg_ctrl):
+        privdefena_desc = {0: "Disables the default memory map",
+                           1: "Enables the default memory map as a background region for privileged access"}
+
+        privdefena = (reg_ctrl & 0x4) >> 2
+        return privdefena_desc.get(privdefena)
+
     def show_mpu_region(self, regions):
         """Show mpu region X"""
 
@@ -268,7 +282,10 @@ class MpuDump(gdb.Command):
         self.mpu_reg = self.parameters[args[0]]
 
         mpu_ctrl = get_register(self.mpu_reg['MPU_CTRL'])
-        gdb.write("mpu ctrl: {:#010x}: {}\n\n".format(mpu_ctrl, self.en_description(mpu_ctrl)))
+        gdb.write("mpu ctrl: {:#010x}\n".format(mpu_ctrl))
+        gdb.write("\t-{}\n".format(self.en_description(mpu_ctrl)))
+        gdb.write("\t-{}\n".format(self.hfnmiena_description(mpu_ctrl)))
+        gdb.write("\t-{}\n".format(self.privdefena_description(mpu_ctrl)))
 
         mpu_type = get_register(self.mpu_reg['MPU_TYPE'])
         nb_region = (mpu_type & 0xFF00) >> 8
@@ -276,7 +293,7 @@ class MpuDump(gdb.Command):
         for i in range(nb_region):
             regions += self.get_mpu_region(i)
 
-        gdb.write("{} mpu region(s)\n".format(len(regions)))
+        gdb.write("\n{} mpu region(s)\n".format(len(regions)))
         gdb.write("----------------\n")
         self.show_mpu_region(regions)
 
